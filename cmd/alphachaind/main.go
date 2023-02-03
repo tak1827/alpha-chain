@@ -7,7 +7,7 @@ import (
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
 	"alpha-chain/app"
-	"alpha-chain/cmd/alpha-chaind/cmd"
+	"alpha-chain/cmd/alphachaind/cmd"
 )
 
 func main() {

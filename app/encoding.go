@@ -3,8 +3,9 @@ package app
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/std"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
+
+	enccodec "github.com/evmos/ethermint/encoding/codec"
 
 	"alpha-chain/app/params"
 )
@@ -27,9 +28,9 @@ func makeEncodingConfig() params.EncodingConfig {
 // MakeEncodingConfig creates an EncodingConfig for testing
 func MakeEncodingConfig() params.EncodingConfig {
 	encodingConfig := makeEncodingConfig()
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	enccodec.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	enccodec.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	return encodingConfig
 }

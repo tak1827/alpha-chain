@@ -42,9 +42,9 @@ init:
 	alphachaind init alphachain --chain-id alphachain_9000-1 --home ./.chaindata
 	alphachaind config chain-id alphachain_9000-1 --home ./.chaindata
 	alphachaind config keyring-backend test --home ./.chaindata
-	alphachaind keys add val --home ./.chaindata
-	alphachaind add-genesis-account val 10000000000000000000000000stake --home ./.chaindata --keyring-backend test
-	alphachaind gentx val 1000000000stake --home ./.chaindata --chain-id alphachain_9000-1
+	alphachaind keys add valkey --home ./.chaindata --keyring-backend test --algo eth_secp256k1
+	alphachaind add-genesis-account valkey 10000000000000000000000000stake --home ./.chaindata --keyring-backend test
+	alphachaind gentx valkey 1000000000stake --home ./.chaindata --chain-id alphachain_9000-1
 	alphachaind collect-gentxs --home ./.chaindata
 	alphachaind start --home ./.chaindata --x-crisis-skip-assert-invariants
 

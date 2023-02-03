@@ -26,6 +26,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	srvflags "github.com/evmos/ethermint/server/flags"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -33,6 +34,7 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
+
 	// this line is used by starport scaffolding # root/moduleImport
 
 	"alpha-chain/app"
@@ -141,6 +143,11 @@ func initRootCmd(
 		txCommand(),
 		keys.Commands(app.DefaultNodeHome),
 	)
+
+	rootCmd, err := srvflags.AddTxFlags(rootCmd)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // queryCommand returns the sub-command to send queries to the app

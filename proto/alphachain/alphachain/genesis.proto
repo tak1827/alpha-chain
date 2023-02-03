@@ -1,0 +1,12 @@
+syntax = "proto3";
+package alphachain.alphachain;
+
+import "gogoproto/gogo.proto";
+import "alphachain/alphachain/params.proto";
+
+option go_package = "alpha-chain/x/alphachain/types";
+
+// GenesisState defines the alphachain module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

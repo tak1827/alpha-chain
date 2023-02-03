@@ -1,0 +1,12 @@
+syntax = "proto3";
+package alphachain.alphachain;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "alpha-chain/x/alphachain/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+  
+}

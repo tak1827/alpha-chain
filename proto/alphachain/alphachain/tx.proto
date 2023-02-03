@@ -1,0 +1,7 @@
+syntax = "proto3";
+package alphachain.alphachain;
+
+option go_package = "alpha-chain/x/alphachain/types";
+
+// Msg defines the Msg service.
+service Msg {}

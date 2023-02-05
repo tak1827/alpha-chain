@@ -35,7 +35,7 @@ install:
 	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/alphachaind
 
 run:
-	alphachaind start --home ./.chaindata --x-crisis-skip-assert-invariants
+	alphachaind start --home ./.chaindata --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace --evm.max-tx-gas-wanted 125677000
 
 init:
 	rm -rf ./.chaindata/*
@@ -43,10 +43,10 @@ init:
 	alphachaind config chain-id alphachain_9000-1 --home ./.chaindata
 	alphachaind config keyring-backend test --home ./.chaindata
 	alphachaind keys add valkey --home ./.chaindata --keyring-backend test --algo eth_secp256k1
-	alphachaind add-genesis-account valkey 10000000000000000000000000stake --home ./.chaindata --keyring-backend test
-	alphachaind gentx valkey 1000000000stake --home ./.chaindata --chain-id alphachain_9000-1
+	alphachaind add-genesis-account valkey 10000000000000000000000000aphoton --home ./.chaindata --keyring-backend test
+	alphachaind gentx valkey 10000000000aphoton --home ./.chaindata --chain-id alphachain_9000-1
 	alphachaind collect-gentxs --home ./.chaindata
-	alphachaind start --home ./.chaindata --x-crisis-skip-assert-invariants
+	alphachaind start --home ./.chaindata --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable
 
 reset:
 	mv ./.chaindata/data/priv_validator_state.origin.json .

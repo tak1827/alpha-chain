@@ -2,6 +2,7 @@
 TEST_PACKAGES=./...
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
+CHAIN_HOME=$(shell pwd)/.chaindata
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=alphachain \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=wvchaind \
@@ -35,22 +36,28 @@ install:
 	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/alphachaind
 
 run:
-	alphachaind start --home ./.chaindata --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace --evm.max-tx-gas-wanted 125677000
+	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace --evm.max-tx-gas-wanted 125677000
 
 init:
-	rm -rf ./.chaindata/*
-	alphachaind init alphachain --chain-id alphachain_9000-1 --home ./.chaindata
-	alphachaind config chain-id alphachain_9000-1 --home ./.chaindata
-	alphachaind config keyring-backend test --home ./.chaindata
-	alphachaind keys add valkey --home ./.chaindata --keyring-backend test --algo eth_secp256k1
-	alphachaind add-genesis-account valkey 10000000000000000000000000aphoton --home ./.chaindata --keyring-backend test
-	alphachaind gentx valkey 10000000000aphoton --home ./.chaindata --chain-id alphachain_9000-1
-	alphachaind collect-gentxs --home ./.chaindata
-	alphachaind start --home ./.chaindata --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable
+	rm -rf $(CHAIN_HOME)/*
+	alphachaind init alphachain --chain-id alphachain_9000-1 --home $(CHAIN_HOME) --staking-bond-denom=aphoton
+
+# Change parameter token denominations to aphoton
+	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
+	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
+	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
+
+	alphachaind config chain-id alphachain_9000-1 --home $(CHAIN_HOME)
+	alphachaind config keyring-backend test --home $(CHAIN_HOME)
+	alphachaind keys add valkey --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
+	alphachaind add-genesis-account valkey 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
+	alphachaind gentx valkey 10000000000aphoton --home $(CHAIN_HOME) --chain-id alphachain_9000-1
+	alphachaind collect-gentxs --home $(CHAIN_HOME)
+	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable
 
 reset:
-	mv ./.chaindata/data/priv_validator_state.origin.json .
-	rm -rf ./.chaindata/data/*
-	mv ./priv_validator_state.origin.json ./.chaindata/data/
-	cp ./.chaindata/data/priv_validator_state.origin.json ./.chaindata/data/priv_validator_state.json
-	rm ./.chaindata/config/write-file*
+	mv $(CHAIN_HOME)/data/priv_validator_state.origin.json .
+	rm -rf $(CHAIN_HOME)/data/*
+	mv ./priv_validator_state.origin.json $(CHAIN_HOME)/data/
+	cp $(CHAIN_HOME)/data/priv_validator_state.origin.json $(CHAIN_HOME)/data/priv_validator_state.json
+	rm $(CHAIN_HOME)/config/write-file*

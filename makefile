@@ -36,7 +36,7 @@ install:
 	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/alphachaind
 
 run:
-	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace --evm.max-tx-gas-wanted 125677000
+	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace
 
 init:
 	rm -rf $(CHAIN_HOME)/*
@@ -46,6 +46,13 @@ init:
 	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
 	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
 	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
+
+# Set block gas limit
+	cat $(CHAIN_HOME)/config/genesis.json | jq '.consensus_params["block"]["max_gas"]="4294967296"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
+
+# Set base fee is false
+	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["feemarket"]["params"]["no_base_fee"]=true' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
+
 
 # Change default parameters
 # Increase mem pool size
@@ -62,6 +69,8 @@ init:
 	alphachaind add-genesis-account bob 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
 	alphachaind keys add tom --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
 	alphachaind add-genesis-account tom 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
+	alphachaind keys add sum --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
+	alphachaind add-genesis-account sum 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
 # validator
 	alphachaind keys add valkey --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
 	alphachaind add-genesis-account valkey 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test

@@ -47,12 +47,28 @@ init:
 	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
 	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="aphoton"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
 
+# Change default parameters
+# Increase mem pool size
+	sed -i -e "s/size = 5000/size = 500000/g" $(CHAIN_HOME)/config/config.toml
+	sed -i -e "s/max_txs_bytes = 1073741824/max_txs_bytes = 4294967296/g" $(CHAIN_HOME)/config/config.toml
+
 	alphachaind config chain-id alphachain_9000-1 --home $(CHAIN_HOME)
 	alphachaind config keyring-backend test --home $(CHAIN_HOME)
+
+# additional accounts
+	alphachaind keys add alice --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
+	alphachaind add-genesis-account alice 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
+	alphachaind keys add bob --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
+	alphachaind add-genesis-account bob 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
+	alphachaind keys add tom --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
+	alphachaind add-genesis-account tom 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
+# validator
 	alphachaind keys add valkey --home $(CHAIN_HOME) --keyring-backend test --algo eth_secp256k1
 	alphachaind add-genesis-account valkey 10000000000000000000000000aphoton --home $(CHAIN_HOME) --keyring-backend test
 	alphachaind gentx valkey 10000000000aphoton --home $(CHAIN_HOME) --chain-id alphachain_9000-1
 	alphachaind collect-gentxs --home $(CHAIN_HOME)
+# backup priv_validator_state
+	cp $(CHAIN_HOME)/data/priv_validator_state.json $(CHAIN_HOME)/data/priv_validator_state.origin.json
 	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable
 
 reset:
@@ -60,4 +76,4 @@ reset:
 	rm -rf $(CHAIN_HOME)/data/*
 	mv ./priv_validator_state.origin.json $(CHAIN_HOME)/data/
 	cp $(CHAIN_HOME)/data/priv_validator_state.origin.json $(CHAIN_HOME)/data/priv_validator_state.json
-	rm $(CHAIN_HOME)/config/write-file*
+#	 rm $(CHAIN_HOME)/config/write-file*

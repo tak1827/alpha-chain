@@ -1,7 +1,17 @@
 syntax = "proto3";
+
 package alphachain.alphachain;
 
 option go_package = "alpha-chain/x/alphachain/types";
 
 // Msg defines the Msg service.
-service Msg {}
+service Msg {
+  rpc CreateWidget (MsgCreateWidget) returns (MsgCreateWidgetResponse);
+}
+message MsgCreateWidget {
+  string creator = 1;
+  string msg     = 2;
+}
+
+message MsgCreateWidgetResponse {}
+

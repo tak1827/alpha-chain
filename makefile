@@ -53,6 +53,8 @@ init:
 # Set base fee is false
 	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["feemarket"]["params"]["no_base_fee"]=true' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
 
+# Reduse voting time
+	cat $(CHAIN_HOME)/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="60s"' > $(CHAIN_HOME)/config/tmp_genesis.json && mv $(CHAIN_HOME)/config/tmp_genesis.json $(CHAIN_HOME)/config/genesis.json
 
 # Change default parameters
 # Increase mem pool size

@@ -7,7 +7,7 @@ import (
 )
 
 func (app *App) RegisterUpgradeHandlers() {
-	planName := "integration-test-upgrade"
+	planName := "cosmovisor-test"
 	app.UpgradeKeeper.SetUpgradeHandler(planName, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})

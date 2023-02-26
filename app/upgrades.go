@@ -1,6 +1,9 @@
 package app
 
 import (
+	"fmt"
+
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -12,23 +15,23 @@ func (app *App) RegisterUpgradeHandlers() {
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
-	// upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-	// if err != nil {
-	// 	panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
-	// }
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
+	}
 
-	// if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-	// 	return
-	// }
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
 
-	// var storeUpgrades *storetypes.StoreUpgrades
+	var storeUpgrades *storetypes.StoreUpgrades
 
 	// switch upgradeInfo.Name {
 	// case v2.UpgradeName:
 	// 	// ...
 	// }
 
-	// if storeUpgrades != nil {
-	// 	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
-	// }
+	if storeUpgrades != nil {
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+	}
 }

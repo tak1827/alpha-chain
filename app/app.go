@@ -499,7 +499,7 @@ func New(
 		keys[alphachainmoduletypes.MemStoreKey],
 		app.GetSubspace(alphachainmoduletypes.ModuleName),
 	)
-	alphachainModule := alphachainmodule.NewAppModule(appCodec, app.AlphachainKeeper, app.AccountKeeper, app.BankKeeper)
+	alphachainModule := alphachainmodule.NewAppModule(appCodec, app.AlphachainKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(alphachainmoduletypes.ModuleName))
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 

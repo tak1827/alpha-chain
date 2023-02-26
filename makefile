@@ -91,3 +91,6 @@ reset:
 	mv ./priv_validator_state.origin.json $(CHAIN_HOME)/data/
 	cp $(CHAIN_HOME)/data/priv_validator_state.origin.json $(CHAIN_HOME)/data/priv_validator_state.json
 #	 rm $(CHAIN_HOME)/config/write-file*
+
+upgrade:
+	sh ./scripts/upgrade.sh

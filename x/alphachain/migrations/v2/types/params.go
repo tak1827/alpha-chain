@@ -7,10 +7,6 @@ import (
 
 var _ paramtypes.ParamSet = (*Params)(nil)
 
-var (
-	ParamsKey = []byte("Params")
-)
-
 // ParamKeyTable the param key table for launch module
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
@@ -41,3 +37,4 @@ func (p Params) String() string {
 	out, _ := yaml.Marshal(p)
 	return string(out)
 }
+

@@ -35,6 +35,9 @@ install:
 	@echo "--> Installing"
 	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/alphachaind
 
+build:
+	go build $(BUILD_FLAGS) -o build/alphachaind ./cmd/alphachaind
+
 run:
 	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace
 

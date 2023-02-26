@@ -9,6 +9,34 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=alphachain \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
 
+
+build_tags = netgo
+ifeq ($(LEDGER_ENABLED),true)
+  ifeq ($(OS),Windows_NT)
+    GCCEXE = $(shell where gcc.exe 2> NUL)
+    ifeq ($(GCCEXE),)
+      $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
+    else
+      build_tags += ledger
+    endif
+  else
+    UNAME_S = $(shell uname -s)
+    ifeq ($(UNAME_S),OpenBSD)
+      $(warning OpenBSD detected, disabling ledger support (https://github.com/cosmos/cosmos-sdk/issues/1988))
+    else
+      GCC = $(shell command -v gcc 2> /dev/null)
+      ifeq ($(GCC),)
+        $(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
+      else
+        build_tags += ledger
+      endif
+    endif
+  endif
+endif
+
+build_tags += $(BUILD_TAGS)
+build_tags := $(strip $(build_tags))
+
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
 # docker:
@@ -31,13 +59,13 @@ test:
 	@echo "--> Running tests"
 	@go test -mod=readonly -timeout=1m $(TEST_PACKAGES)
 
-.PHONY: build
-build:
-	go build $(BUILD_FLAGS) -o build/alphachaind ./cmd/alphachaind
-
 install:
 	@echo "--> Installing"
 	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/alphachaind
+
+.PHONY: build
+build:
+	go build $(BUILD_FLAGS) -o build/alphachaind ./cmd/alphachaind
 
 run:
 	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace
@@ -84,7 +112,17 @@ init:
 	alphachaind collect-gentxs --home $(CHAIN_HOME)
 # backup priv_validator_state
 	cp $(CHAIN_HOME)/data/priv_validator_state.json $(CHAIN_HOME)/data/priv_validator_state.origin.json
-	alphachaind start --home $(CHAIN_HOME) --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable
+
+cosmovisor-init:
+	export DAEMON_NAME=aphoton
+	export DAEMON_HOME=$(CHAIN_HOME)
+	export DAEMON_RESTART_AFTER_UPGRADE=true
+	mkdir -p $(DAEMON_HOME)/cosmovisor/genesis/bin
+	make build
+	cp ./build/alphachaind $(DAEMON_HOME)/cosmovisor/genesis/bin
+
+cosmovisor-run:
+	cosmovisor run start --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable --evm.tracer=json --trace --home ./.chaindata
 
 reset:
 	mv $(CHAIN_HOME)/data/priv_validator_state.origin.json .

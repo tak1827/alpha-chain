@@ -30,6 +30,10 @@ test:
 	@echo "--> Running tests"
 	@go test -mod=readonly -timeout=1m $(TEST_PACKAGES)
 
+.PHONY: build
+build:
+	go build $(BUILD_FLAGS) -o build/alphachaind ./cmd/alphachaind
+
 install:
 	@echo "--> Installing"
 	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/alphachaind

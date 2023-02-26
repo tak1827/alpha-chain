@@ -117,6 +117,7 @@ cosmovisor-init:
 	export DAEMON_NAME=aphoton
 	export DAEMON_HOME=$(CHAIN_HOME)
 	export DAEMON_RESTART_AFTER_UPGRADE=true
+	export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
 	mkdir -p $(DAEMON_HOME)/cosmovisor/genesis/bin
 	make build
 	cp ./build/alphachaind $(DAEMON_HOME)/cosmovisor/genesis/bin
